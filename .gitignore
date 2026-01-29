@@ -1,0 +1,33 @@
+# Planning intelligence (auto-generated, regeneratable)
+.planning/intel/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Model checkpoints (large files)
+checkpoints/*.pt
+checkpoints/*.bin
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
