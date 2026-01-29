@@ -9,20 +9,21 @@
 See: `.planning/PROJECT.md` (updated 2025-01-30)
 
 **Core value:** Teach distributed ML training through hands-on implementation using only free resources
-**Current focus:** Phase 2 — Baseline Training
+**Current focus:** Phase 3 — Distributed Training (DDP)
 
 ---
 
 ## Current Position
 
 ```
-Phase 1 ✓ ──► Phase 2 ◆ ──► Phase 3 ○ ──► Phase 4 ○ ──► Phase 5 ○ ──► Phase 6 ○ ──► Phase 7 ○
+Phase 1 ✓ ──► Phase 2 ✓ ──► Phase 3 ◆ ──► Phase 4 ○ ──► Phase 5 ○ ──► Phase 6 ○ ──► Phase 7 ○
 Foundation   Baseline    DDP       Inference   Benchmark   Document   Deploy
+   DONE        DONE      NEXT
 
 ◆ = Current    ○ = Pending    ✓ = Complete
 ```
 
-**Current Phase:** Phase 2 — Baseline Training
+**Current Phase:** Phase 3 — Distributed Training
 **Current Task:** Not started
 **Blocked By:** None
 
@@ -33,8 +34,8 @@ Foundation   Baseline    DDP       Inference   Benchmark   Document   Deploy
 | Phase | Status | Plans | Progress |
 |-------|--------|-------|----------|
 | 1 - Foundation | ✓ Complete | 1/1 | 100% |
-| 2 - Baseline | ◆ Current | 0/0 | 0% |
-| 3 - DDP | ○ Pending | 0/0 | 0% |
+| 2 - Baseline | ✓ Complete | 1/1 | 100% |
+| 3 - DDP | ◆ Current | 0/0 | 0% |
 | 4 - Inference | ○ Pending | 0/0 | 0% |
 | 5 - Benchmark | ○ Pending | 0/0 | 0% |
 | 6 - Documentation | ○ Pending | 0/0 | 0% |
@@ -44,19 +45,23 @@ Foundation   Baseline    DDP       Inference   Benchmark   Document   Deploy
 
 ## Recent Progress
 
+### Phase 2: Baseline ✓ (2025-01-30)
+
+**Files created:**
+- `training/utils.py` — Helper functions (metrics, checkpointing)
+- `training/train_single.py` — Complete single-GPU training script
+
+**Concepts learned:**
+- The 5-step training loop (forward, loss, backward, optimize, zero_grad)
+- What backpropagation does (computes gradients)
+- How loss guides learning (lower loss = better predictions)
+- Why we need optimizer.zero_grad() (prevent gradient accumulation)
+- model.train() vs model.eval() modes
+
 ### Phase 1: Foundation ✓ (2025-01-30)
 
 **Files created:**
-- `requirements.txt` — All dependencies with explanations
-- `training/__init__.py` — Package marker
-- `training/model.py` — NewsClassifier (DistilBERT wrapper)
-- `training/dataset.py` — AGNewsDataset + tokenization
-
-**Concepts learned:**
-- What is DistilBERT and why we use it
-- How tokenization works (text → numbers)
-- What attention masks are for
-- How PyTorch Dataset interface works
+- `requirements.txt`, `training/model.py`, `training/dataset.py`
 
 ---
 
@@ -70,6 +75,8 @@ Foundation   Baseline    DDP       Inference   Benchmark   Document   Deploy
 | DistilBERT over BERT | Init | Faster training, fits on T4 |
 | Step-by-step learning mode | Init | User wants comprehensive explanations |
 | max_length=128 | Phase 1 | Good balance of context vs speed |
+| AdamW with lr=2e-5 | Phase 2 | Standard for transformer fine-tuning |
+| weight_decay=0.01 | Phase 2 | Prevents overfitting |
 
 ---
 
@@ -83,14 +90,15 @@ Foundation   Baseline    DDP       Inference   Benchmark   Document   Deploy
 
 **Last Session:** 2025-01-30
 **Context:**
-- Phase 1 completed
-- Model and dataset code written with comprehensive explanations
-- Ready to begin Phase 2 (baseline training)
+- Phase 1 and 2 completed
+- Have working model, dataset, and single-GPU training
+- Ready for the core learning: DDP distributed training
 
 **Next Actions:**
-1. Start Phase 2 — create training utilities
-2. Build single-GPU training script
-3. Test training loop on CPU locally
+1. Start Phase 3 — distributed training with DDP
+2. Create train_ddp.py with DDP wrapper
+3. Create run_ddp.sh launcher script
+4. Test on Kaggle with 2 GPUs
 
 ---
 
@@ -102,7 +110,9 @@ distrinews/
 ├── training/
 │   ├── __init__.py        ✓
 │   ├── model.py           ✓
-│   └── dataset.py         ✓
+│   ├── dataset.py         ✓
+│   ├── utils.py           ✓
+│   └── train_single.py    ✓
 ├── inference/              (empty)
 ├── checkpoints/            (empty)
 └── benchmarks/             (empty)
@@ -113,17 +123,11 @@ distrinews/
 ├── REQUIREMENTS.md        ✓
 ├── ROADMAP.md             ✓
 ├── STATE.md               ✓ (this file)
-├── intel/                 ✓ (empty, for hooks)
-├── research/
-│   ├── CONCEPTS.md        ✓
-│   ├── STACK.md           ✓
-│   ├── ARCHITECTURE.md    ✓
-│   ├── PITFALLS.md        ✓
-│   └── SUMMARY.md         ✓
+├── intel/                 ✓ (empty)
+├── research/              ✓ (5 files)
 └── phases/
-    └── 01-foundation/
-        ├── 01-01-PLAN.md     ✓
-        └── 01-01-SUMMARY.md  ✓
+    ├── 01-foundation/     ✓
+    └── 02-baseline/       ✓
 ```
 
 ---
@@ -131,10 +135,17 @@ distrinews/
 ## Learning Notes
 
 ### Phase 1 Takeaways:
-1. **Transformers use attention** — the model learns which words matter for each task
-2. **Tokenization is essential** — models only understand numbers, not text
-3. **Padding + attention mask** — handle variable-length inputs in batches
-4. **PyTorch Dataset** — provides `__len__` and `__getitem__` for DataLoader
+1. **Transformers use attention** — model learns which words matter
+2. **Tokenization is essential** — models only understand numbers
+3. **Padding + attention mask** — handle variable-length inputs
+4. **PyTorch Dataset** — provides `__len__` and `__getitem__`
+
+### Phase 2 Takeaways:
+1. **Training loop = 5 steps** — forward, loss, backward, optimize, zero_grad
+2. **Gradients point to loss** — positive = increase weight increases loss
+3. **Learning rate controls step size** — too high = unstable, too low = slow
+4. **AdamW is standard** — for transformer fine-tuning
+5. **model.eval() + no_grad()** — for inference (faster, less memory)
 
 ---
-*State updated: 2025-01-30 after Phase 1 completion*
+*State updated: 2025-01-30 after Phase 2 completion*
