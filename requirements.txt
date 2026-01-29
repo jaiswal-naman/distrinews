@@ -1,0 +1,51 @@
+# DistriNews Dependencies
+# ======================
+# Install with: pip install -r requirements.txt
+
+# ============================================================================
+# CORE ML FRAMEWORK
+# ============================================================================
+
+# PyTorch - The ML framework we're using
+# Why: Industry standard, has built-in DDP support, excellent for research & production
+# Note: Version 2.1+ has improved distributed training
+torch>=2.1.0
+
+# HuggingFace Transformers - Pre-trained models
+# Why: Provides DistilBERT and other transformer models ready to use
+# Without this, we'd have to implement transformers from scratch (weeks of work)
+transformers>=4.36.0
+
+# HuggingFace Datasets - Easy dataset loading
+# Why: AG News and 1000s of other datasets with one line of code
+# Handles downloading, caching, and efficient loading
+datasets>=2.16.0
+
+# ============================================================================
+# INFERENCE API
+# ============================================================================
+
+# FastAPI - Modern web framework
+# Why: Fast, automatic docs, type hints, async support
+# Better than Flask for ML APIs
+fastapi>=0.109.0
+
+# Uvicorn - ASGI server to run FastAPI
+# Why: Production-ready server, handles concurrent requests
+uvicorn>=0.27.0
+
+# Pydantic - Data validation (used by FastAPI)
+# Why: Validates API inputs, provides clear error messages
+pydantic>=2.5.0
+
+# ============================================================================
+# UTILITIES
+# ============================================================================
+
+# TQDM - Progress bars
+# Why: Shows training progress, much better UX than print statements
+tqdm>=4.66.0
+
+# NumPy - Numerical computing
+# Why: Required by PyTorch, useful for metrics
+numpy>=1.24.0
