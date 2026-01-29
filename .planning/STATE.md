@@ -9,21 +9,21 @@
 See: `.planning/PROJECT.md` (updated 2025-01-30)
 
 **Core value:** Teach distributed ML training through hands-on implementation using only free resources
-**Current focus:** Phase 3 — Distributed Training (DDP)
+**Current focus:** Phase 4 — Inference API
 
 ---
 
 ## Current Position
 
 ```
-Phase 1 ✓ ──► Phase 2 ✓ ──► Phase 3 ◆ ──► Phase 4 ○ ──► Phase 5 ○ ──► Phase 6 ○ ──► Phase 7 ○
+Phase 1 ✓ ──► Phase 2 ✓ ──► Phase 3 ✓ ──► Phase 4 ◆ ──► Phase 5 ○ ──► Phase 6 ○ ──► Phase 7 ○
 Foundation   Baseline    DDP       Inference   Benchmark   Document   Deploy
-   DONE        DONE      NEXT
+   DONE        DONE      DONE        NEXT
 
 ◆ = Current    ○ = Pending    ✓ = Complete
 ```
 
-**Current Phase:** Phase 3 — Distributed Training
+**Current Phase:** Phase 4 — Inference API
 **Current Task:** Not started
 **Blocked By:** None
 
@@ -35,8 +35,8 @@ Foundation   Baseline    DDP       Inference   Benchmark   Document   Deploy
 |-------|--------|-------|----------|
 | 1 - Foundation | ✓ Complete | 1/1 | 100% |
 | 2 - Baseline | ✓ Complete | 1/1 | 100% |
-| 3 - DDP | ◆ Current | 0/0 | 0% |
-| 4 - Inference | ○ Pending | 0/0 | 0% |
+| 3 - DDP | ✓ Complete | 1/1 | 100% |
+| 4 - Inference | ◆ Current | 0/0 | 0% |
 | 5 - Benchmark | ○ Pending | 0/0 | 0% |
 | 6 - Documentation | ○ Pending | 0/0 | 0% |
 | 7 - Deployment | ○ Pending | 0/0 | 0% |
@@ -45,23 +45,27 @@ Foundation   Baseline    DDP       Inference   Benchmark   Document   Deploy
 
 ## Recent Progress
 
-### Phase 2: Baseline ✓ (2025-01-30)
+### Phase 3: DDP ✓ (2025-01-30)
 
 **Files created:**
-- `training/utils.py` — Helper functions (metrics, checkpointing)
-- `training/train_single.py` — Complete single-GPU training script
+- `training/train_ddp.py` — Full DDP training script
+- `training/run_ddp.sh` — torchrun launcher (Linux/Mac)
+- `training/run_ddp.bat` — torchrun launcher (Windows)
 
-**Concepts learned:**
-- The 5-step training loop (forward, loss, backward, optimize, zero_grad)
-- What backpropagation does (computes gradients)
-- How loss guides learning (lower loss = better predictions)
-- Why we need optimizer.zero_grad() (prevent gradient accumulation)
-- model.train() vs model.eval() modes
+**DDP concepts learned:**
+- Process groups and init_process_group()
+- RANK, LOCAL_RANK, WORLD_SIZE
+- DistributedDataParallel wrapper
+- DistributedSampler for data sharding
+- set_epoch() for proper shuffling
+- Rank 0 only logging/checkpointing
+- Clean shutdown with destroy_process_group()
+
+### Phase 2: Baseline ✓ (2025-01-30)
+- Training loop, utils, checkpointing
 
 ### Phase 1: Foundation ✓ (2025-01-30)
-
-**Files created:**
-- `requirements.txt`, `training/model.py`, `training/dataset.py`
+- Model wrapper, dataset loader, dependencies
 
 ---
 
@@ -71,18 +75,9 @@ Foundation   Baseline    DDP       Inference   Benchmark   Document   Deploy
 |----------|------|-----------|
 | Use Kaggle for training | Init | Free 2x T4 GPUs, 30 hrs/week |
 | Use HF Spaces for deploy | Init | Free FastAPI hosting, git-based |
-| CPU simulation for local dev | Init | Learn DDP without GPUs locally |
 | DistilBERT over BERT | Init | Faster training, fits on T4 |
-| Step-by-step learning mode | Init | User wants comprehensive explanations |
-| max_length=128 | Phase 1 | Good balance of context vs speed |
 | AdamW with lr=2e-5 | Phase 2 | Standard for transformer fine-tuning |
-| weight_decay=0.01 | Phase 2 | Prevents overfitting |
-
----
-
-## Open Issues
-
-(None)
+| NCCL backend | Phase 3 | Fastest for GPU-to-GPU communication |
 
 ---
 
@@ -90,15 +85,14 @@ Foundation   Baseline    DDP       Inference   Benchmark   Document   Deploy
 
 **Last Session:** 2025-01-30
 **Context:**
-- Phase 1 and 2 completed
-- Have working model, dataset, and single-GPU training
-- Ready for the core learning: DDP distributed training
+- Phases 1, 2, 3 completed
+- Have full DDP training pipeline
+- Ready to build inference API
 
 **Next Actions:**
-1. Start Phase 3 — distributed training with DDP
-2. Create train_ddp.py with DDP wrapper
-3. Create run_ddp.sh launcher script
-4. Test on Kaggle with 2 GPUs
+1. Start Phase 4 — build FastAPI inference server
+2. Create model_loader.py for checkpoint loading
+3. Create app.py with /predict endpoint
 
 ---
 
@@ -112,40 +106,33 @@ distrinews/
 │   ├── model.py           ✓
 │   ├── dataset.py         ✓
 │   ├── utils.py           ✓
-│   └── train_single.py    ✓
-├── inference/              (empty)
-├── checkpoints/            (empty)
-└── benchmarks/             (empty)
-
-.planning/
-├── PROJECT.md             ✓
-├── config.json            ✓
-├── REQUIREMENTS.md        ✓
-├── ROADMAP.md             ✓
-├── STATE.md               ✓ (this file)
-├── intel/                 ✓ (empty)
-├── research/              ✓ (5 files)
-└── phases/
-    ├── 01-foundation/     ✓
-    └── 02-baseline/       ✓
+│   ├── train_single.py    ✓
+│   ├── train_ddp.py       ✓  ← THE MAIN LEARNING
+│   ├── run_ddp.sh         ✓
+│   └── run_ddp.bat        ✓
+├── inference/              (empty - Phase 4)
+├── checkpoints/            (empty - created during training)
+└── benchmarks/             (empty - Phase 5)
 ```
 
 ---
 
 ## Learning Notes
 
-### Phase 1 Takeaways:
-1. **Transformers use attention** — model learns which words matter
-2. **Tokenization is essential** — models only understand numbers
-3. **Padding + attention mask** — handle variable-length inputs
-4. **PyTorch Dataset** — provides `__len__` and `__getitem__`
+### Phase 3 Takeaways (THE CORE):
+1. **DDP = Same model, different data, synced gradients**
+2. **init_process_group()** — All GPUs join a communication group
+3. **LOCAL_RANK** — Which GPU this process uses
+4. **DDP wrapper** — Adds gradient sync hooks to backward()
+5. **DistributedSampler** — Ensures no data overlap between GPUs
+6. **set_epoch()** — Different shuffle each epoch (uses epoch as seed)
+7. **Rank 0 only** — Logging and checkpointing to avoid duplicates
+8. **backward() does the magic** — AllReduce happens automatically
 
-### Phase 2 Takeaways:
-1. **Training loop = 5 steps** — forward, loss, backward, optimize, zero_grad
-2. **Gradients point to loss** — positive = increase weight increases loss
-3. **Learning rate controls step size** — too high = unstable, too low = slow
-4. **AdamW is standard** — for transformer fine-tuning
-5. **model.eval() + no_grad()** — for inference (faster, less memory)
+### Interview One-Liner:
+> "DDP wraps the model and hooks into backward(). When loss.backward() is called,
+> DDP performs AllReduce to average gradients across all GPUs. Each GPU then
+> makes identical updates, keeping models synchronized."
 
 ---
-*State updated: 2025-01-30 after Phase 2 completion*
+*State updated: 2025-01-30 after Phase 3 completion*
