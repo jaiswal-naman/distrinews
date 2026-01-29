@@ -9,59 +9,37 @@
 See: `.planning/PROJECT.md` (updated 2025-01-30)
 
 **Core value:** Teach distributed ML training through hands-on implementation using only free resources
-**Current focus:** Phase 5 — Benchmarking
+**Current focus:** Phase 7 — Deployment to Hugging Face Spaces
 
 ---
 
 ## Current Position
 
 ```
-Phase 1 ✓ ──► Phase 2 ✓ ──► Phase 3 ✓ ──► Phase 4 ✓ ──► Phase 5 ◆ ──► Phase 6 ○ ──► Phase 7 ○
+Phase 1 ✓ ──► Phase 2 ✓ ──► Phase 3 ✓ ──► Phase 4 ✓ ──► Phase 5 ✓ ──► Phase 6 ✓ ──► Phase 7 ◆
 Foundation   Baseline    DDP       Inference   Benchmark   Document   Deploy
-   DONE        DONE      DONE        DONE        NEXT
+   DONE        DONE      DONE        DONE        DONE        DONE      NEXT
 
 ◆ = Current    ○ = Pending    ✓ = Complete
 ```
 
-**Current Phase:** Phase 5 — Benchmarking
-**Current Task:** Not started
+**Current Phase:** Phase 7 — Deployment
+**Current Task:** Create HF Spaces deployment files
 **Blocked By:** None
 
 ---
 
 ## Phase Status
 
-| Phase | Status | Plans | Progress |
-|-------|--------|-------|----------|
-| 1 - Foundation | ✓ Complete | 1/1 | 100% |
-| 2 - Baseline | ✓ Complete | 1/1 | 100% |
-| 3 - DDP | ✓ Complete | 1/1 | 100% |
-| 4 - Inference | ✓ Complete | 1/1 | 100% |
-| 5 - Benchmark | ◆ Current | 0/0 | 0% |
-| 6 - Documentation | ○ Pending | 0/0 | 0% |
-| 7 - Deployment | ○ Pending | 0/0 | 0% |
-
----
-
-## Recent Progress
-
-### Phase 4: Inference ✓ (2025-01-30)
-
-**Files created:**
-- `inference/model_loader.py` — Load checkpoint for inference
-- `inference/app.py` — FastAPI server with /predict
-
-**Concepts learned:**
-- Load model once at startup (not per request)
-- Pydantic for input validation
-- model.eval() + torch.no_grad() for inference
-- Device auto-detection
-
-### Phase 3: DDP ✓ (2025-01-30)
-- Full DDP training script with all concepts explained
-
-### Phases 1-2: ✓
-- Model, dataset, training loop
+| Phase | Status | Progress |
+|-------|--------|----------|
+| 1 - Foundation | ✓ Complete | 100% |
+| 2 - Baseline | ✓ Complete | 100% |
+| 3 - DDP | ✓ Complete | 100% |
+| 4 - Inference | ✓ Complete | 100% |
+| 5 - Benchmark | ✓ Complete | 100% |
+| 6 - Documentation | ✓ Complete | 100% |
+| 7 - Deployment | ◆ Current | 0% |
 
 ---
 
@@ -70,30 +48,44 @@ Foundation   Baseline    DDP       Inference   Benchmark   Document   Deploy
 ```
 distrinews/
 ├── requirements.txt        ✓
+├── README.md               ✓ (comprehensive!)
 ├── training/
 │   ├── __init__.py        ✓
 │   ├── model.py           ✓
 │   ├── dataset.py         ✓
 │   ├── utils.py           ✓
 │   ├── train_single.py    ✓
-│   ├── train_ddp.py       ✓
+│   ├── train_ddp.py       ✓ ← THE MAIN LEARNING
 │   ├── run_ddp.sh         ✓
 │   └── run_ddp.bat        ✓
 ├── inference/
 │   ├── __init__.py        ✓
 │   ├── model_loader.py    ✓
 │   └── app.py             ✓
-├── checkpoints/            (created during training)
-└── benchmarks/             (Phase 5)
+├── benchmarks/
+│   ├── single_gpu.md      ✓
+│   └── ddp_2gpu.md        ✓
+└── checkpoints/            (created during training)
 ```
 
 ---
 
-## Next Actions
+## Summary of What You've Built
 
-1. Create benchmark documentation templates
-2. Instructions for running on Kaggle
-3. Expected results and speedup analysis
+1. **Foundation:** DistilBERT model wrapper + AG News dataset loader
+2. **Baseline:** Single-GPU training with full training loop explanation
+3. **DDP:** Distributed training with every concept explained
+4. **Inference:** FastAPI server with /predict endpoint
+5. **Benchmarks:** Expected results for 1 GPU vs 2 GPU
+6. **Documentation:** Comprehensive README
 
 ---
-*State updated: 2025-01-30 after Phase 4 completion*
+
+## Next: Deploy to Hugging Face Spaces
+
+Phase 7 will create:
+- Deployment files for HF Spaces
+- Instructions for deployment
+
+---
+*State updated: 2025-01-30 after Phase 5 & 6 completion*
